@@ -1,0 +1,34 @@
+#!/bin/sh -e
+# boe - Batch Opus Encoder
+
+help() {
+    printf "boe\n"
+    printf "Usage:\n"
+    printf "boe [options] -i ALBUMDIR\n"
+    printf "\n"
+    printf "Options:"
+    printf "\n-i (INPUTDIRECTORY)"
+    printf "\n-o (OUTPUTDIRECTORY)"
+    printf "\n-r (RECURSIVE)"
+    printf "\n-b (BITRATE)"
+    exit
+}
+
+while getopts i:o:b:*r option
+do
+    case "${option}"
+    in
+    i) INPUT=$(realpath -e "${OPTARG}");;
+    o) OUTPUT=$(realpath -e "${OPTARG}");;
+    r) SUBDIRS="true";;
+    b) BITRATE="${OPTARG}";;
+    *) help;;
+    esac
+done
+
+for SONG in "$INPUT"/*.flac;
+do
+    printf "Encoding ${SONG##*/} to Opus at $BITRATE KB/s\n"
+    opusenc --bitrate $BITRATE "$SONG" "$OUTPUT"/"${SONG%.*}.opus"
+    printf "${SONG##*/} is done encoding\n"
+done
