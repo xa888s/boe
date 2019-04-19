@@ -28,7 +28,8 @@ done
 
 for SONG in "$INPUT"/*.flac;
 do
-    printf "Encoding ${SONG##*/} to Opus at $BITRATE KB/s\n"
-    opusenc --bitrate $BITRATE "$SONG" "$OUTPUT"/"${SONG%.*}.opus"
-    printf "${SONG##*/} is done encoding\n"
+    SONGNOEXT="${SONG%.*}"
+    printf "Encoding ${SONGNOEXT##*/} to Opus at $BITRATE KB/s\n"
+    opusenc --bitrate $BITRATE "$SONG" "$OUTPUT/${SONGNOEXT##*/}.opus"
+    printf "${SONGNOEXT##*/} is done encoding\n"
 done
