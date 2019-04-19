@@ -5,11 +5,9 @@ help() {
     printf "boe\n"
     printf "Usage:\n"
     printf "boe [options] -i ALBUMDIR\n"
-    printf "\n"
-    printf "Options:"
+    printf "\nOptions:"
     printf "\n-i (INPUTDIRECTORY)"
     printf "\n-o (OUTPUTDIRECTORY)"
-    printf "\n-r (RECURSIVE)"
     printf "\n-b (BITRATE)"
     exit
 }
@@ -25,10 +23,11 @@ do
     esac
 done
 
+mkdir -p "$OUTPUT"/"${INPUT##*/}" || exit
 for SONG in "$INPUT"/*.flac;
 do
     SONGNOEXT="${SONG%.*}"
-    printf "Encoding ${SONGNOEXT##*/} to Opus at $BITRATE KB/s\n"
-    opusenc --bitrate $BITRATE "$SONG" "$OUTPUT/${SONGNOEXT##*/}.opus"
+    printf "Encoding ${SONGNOEXT##*/} to Opus at ${BITRATE}KB/s\n"
+    opusenc --quiet --bitrate $BITRATE "$SONG" "$OUTPUT"/"${INPUT##*/}""${SONGNOEXT##*/}.opus"
     printf "${SONGNOEXT##*/} is done encoding\n"
 done
