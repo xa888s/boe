@@ -14,6 +14,9 @@ help() {
     exit
 }
 
+# Defaults (if something isn't specified)
+BITRATE=128
+
 while getopts i:o:b:*r option
 do
     case "${option}"
@@ -31,12 +34,12 @@ encode() {
     FLAC=$(ls -1 "$INPUT"/*.flac 2>/dev/null | wc -l)
     if [ $FLAC != 0 ];
     then
-	mkdir -p "$SUBDIR"/ || exit
+        mkdir -p "$SUBDIR"/ || exit
         for SONG in "$INPUT"/*.flac ;
         do
             SONGNOEXT="${SONG%.*}"
             printf "Encoding ${SONGNOEXT##*/} to Opus at ~${BITRATE}KB/s\n"
-	    opusenc --quiet --bitrate $BITRATE "$SONG" "$SUBDIR"/"${SONGNOEXT##*/}.opus"
+            opusenc --quiet --bitrate $BITRATE "$SONG" "$SUBDIR"/"${SONGNOEXT##*/}.opus"
             printf "${SONGNOEXT##*/} is done encoding\n"
         done
     fi
@@ -47,7 +50,7 @@ subdir() {
     BASEOUTPUT="$(basename "$OUTPUT")"
     for DIR in "$1"/**/;
     do
-	SUBDIR="$(printf "$(realpath "$DIR")\n" | sed -e s/"$BASEINPUT"/"$BASEOUTPUT"/ -e s/^.*"$BASEOUTPUT"/'\/'"$BASEOUTPUT"'\/'/)"
+        SUBDIR="$(printf "$(realpath "$DIR")\n" | sed -e s/"$BASEINPUT"/"$BASEOUTPUT"/ -e s/^.*"$BASEOUTPUT"/'\/'"$BASEOUTPUT"'\/'/)"
         encode "$(realpath "$DIR")"
     done
 }
