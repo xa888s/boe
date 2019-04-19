@@ -14,13 +14,12 @@ help() {
     exit
 }
 
-while getopts i:o:b:*r option
+while getopts i:o:b:* option
 do
     case "${option}"
     in
     i) INPUT=$(realpath -e "${OPTARG}");;
     o) OUTPUT=$(realpath -e "${OPTARG}");;
-    r) SUBDIRS="true";;
     b) BITRATE="${OPTARG}";;
     *) help;;
     esac
