@@ -1,7 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
 # boe - Batch Opus Encoder
-shopt -s globstar >> /dev/null
-
 help() {
     printf "boe\n"
     printf "Usage:\n"
@@ -11,55 +9,62 @@ help() {
     printf "\n-o (OUTPUTDIRECTORY)"
     printf "\n-b (BITRATE)"
     printf "\n-r (RECURSIVE)\n"
-    exit
+    exit 1
 }
 
 # Defaults (if something isn't specified)
-BITRATE=128
-
-while getopts i:o:b:*r option
-do
-    case "${option}"
-    in
-    i) INPUT=$(realpath -e "${OPTARG}");;
-    o) OUTPUT=$(realpath -e "${OPTARG}");;
-    b) BITRATE="${OPTARG}";;
-    r) RECURSIVE="true";;
-    *) help;;
-    esac
-done
-
-encode() {
-    INPUT="$1"
-    FLAC=$(ls -1 "$INPUT"/*.flac 2>/dev/null | wc -l)
-    if [ $FLAC != 0 ];
-    then
-        printf "$SUBDIR\n"
-        mkdir -p "$SUBDIR"/ || exit
-        for SONG in "$INPUT"/*.flac ;
-        do
-            SONGNOEXT="${SONG%.*}"
-            printf "Encoding ${SONGNOEXT##*/} to Opus at ~${BITRATE}KB/s\n"
-            opusenc --quiet --bitrate $BITRATE "$SONG" "$SUBDIR"/"${SONGNOEXT##*/}.opus"
-            printf "${SONGNOEXT##*/} is done encoding\n"
-        done
-    fi
+set_globals() {
+    shopt -s globstar > /dev/null 2>&1
+    _bitrate=128
 }
 
-subdir() {
-    BASEINPUT="$(basename "$INPUT")"
-    BASEOUTPUT="$(basename "$OUTPUT")"
-    for DIR in "$1"/**/;
+get_args() {
+    while getopts i:o:b:*r option
     do
-        SUBDIR="$(printf "$(realpath "$DIR")\n" | sed -e s/"$BASEINPUT"/"$BASEOUTPUT"/ -e s/^.*"$BASEOUTPUT"/'\/'"$BASEOUTPUT"'\/'/)"
-        encode "$(realpath "$DIR")"
+        case "${option}"
+            in
+            i) _in=$(realpath -e "${OPTARG}");;
+            o) _out=$(realpath -e "${OPTARG}");;
+            b) _bitrate="${OPTARG}";;
+            *) help;;
+        esac
     done
 }
 
-if [ $RECURSIVE ];
-then
-    subdir "$INPUT" 
-else
-    SUBDIR="$OUTPUT"/"${INPUT##*/}"
-    encode "$INPUT"
-fi
+encode() {
+    local _dir=""
+    _dir=$(printf '%q\n' "$1")
+    if compgen -G "${_dir}"'/*.flac' > /dev/null 2>&1
+    then
+        local _song_list=("$1"/*.flac) > /dev/null 2>&1
+        local _dir="$2"
+        printf -- '-------------------------------------------------------------\n'
+        printf 'Now encoding all .flac in %s\n' "$1"
+        printf -- '-------------------------------------------------------------\n'
+        mkdir -p "$_dir" || \
+            { printf "Failed to create subdirectory\n"; exit 1; }
+            for _song in "${_song_list[@]}"
+            do
+                local _song_full="$_song"
+                local _song="${_song##*/}"
+                printf 'Encoding %s to Opus at ~%sKB/s\n' "${_song%.*}" "${_bitrate}"
+                opusenc --quiet --bitrate "$_bitrate" "$_song_full" "$_dir/${_song%.*}.opus"
+                printf '%s is done encoding\n' "${_song%.*}"
+            done
+    fi
+}
+
+recurse() {
+    for _dir in "${_in:?}"/**/;
+    do
+        encode "$_dir" "${_dir/$_in/$_out}"
+    done
+}
+
+main() {
+    set_globals
+    get_args "$@"
+    recurse
+}
+
+main "$@"

@@ -1,5 +1,3 @@
-# DON'T USE. COMPLETELY BROKEN (for now)
-
 # boe
 
 boe stands for **B**atch **O**pus **E**ncoder
@@ -10,7 +8,8 @@ Encoding your entire (lossless) music collection into something a little more mo
 
 # Dependencies
 
-opusenc (to encode to opus)
+- modern version of bash (bash >= 4)
+- opusenc (to encode to opus)
 
 # Usage
 
@@ -20,23 +19,16 @@ git clone https://cryptid.cc/lost/boe.git
 cd boe
 ```
 
-## Encoding a single album with no subdirectories
+## Encoding albums
 
-To encode an album with no subdirectories you need to specify the "-o" and "-i" arguments with the output directory and input directory respectively.
+To encode albums you need to specify the "-o" and "-i" arguments with the output directory and input directory respectively.
 ```
-./boe -i /path/to/albumdirectory -o /path/to/outputdirectory
-```
-
-## Encoding a single album with a different bitrate 
-
-For this you would use the "-b" argument
-```
-./boe -i /path/to/albumdirectory -o /path/to/outputdirectory -b YOURBITRATE (example: -b 128)
+./boe -i /path/to/inputdirectory -o /path/to/outputdirectory
 ```
 
-## Encoding multiple albums and multiple subdirectories in the album
+## Encoding albums with a different bitrate 
 
-Using the "-r" or recursive option allows you to recursively encode all subdirectories in the directory you specify
+For this you would use the "-b" argument to specify a bitrate (in kbps)
 ```
-./boe -i /path/to/albumdirectory -o /path/to/outputdirectory -r
+./boe -i /path/to/inputdirectory -o /path/to/outputdirectory -b bitrate
 ```
