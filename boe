@@ -10,7 +10,7 @@ help() {
     printf "\n-b (BITRATE)"
     printf "\n-r (RECURSIVE)\n"
     exit 1
-}
+} 1>&2
 
 # Defaults (if something isn't specified)
 set_globals() {
@@ -19,7 +19,7 @@ set_globals() {
 }
 
 get_args() {
-    while getopts i:o:b:*r option
+    while getopts i:o:b: option
     do
         case "${option}"
             in
