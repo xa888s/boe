@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 # boe - Batch Opus Encoder
 shopt -s globstar >> /dev/null
 
@@ -34,6 +34,7 @@ encode() {
     FLAC=$(ls -1 "$INPUT"/*.flac 2>/dev/null | wc -l)
     if [ $FLAC != 0 ];
     then
+        printf "$SUBDIR\n"
         mkdir -p "$SUBDIR"/ || exit
         for SONG in "$INPUT"/*.flac ;
         do

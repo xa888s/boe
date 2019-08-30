@@ -1,3 +1,5 @@
+# DON'T USE. COMPLETELY BROKEN (for now)
+
 # boe
 
 boe stands for **B**atch **O**pus **E**ncoder
